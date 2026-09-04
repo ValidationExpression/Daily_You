@@ -84,6 +84,9 @@ class BulletListContinuation {
   }
 
   bool _isSingleTypedNewline(String text) {
+    final previous = _previousText;
+    if (text == previous) return false;
+
     final selection = _controller.selection;
     final cursor = selection.baseOffset;
     if (!selection.isCollapsed || cursor <= 0 || cursor > text.length) {
@@ -91,7 +94,6 @@ class BulletListContinuation {
     }
     if (text[cursor - 1] != '\n') return false;
 
-    final previous = _previousText;
     final tailLength = text.length - cursor;
     final oldTailStart = previous.length - tailLength;
     if (oldTailStart < 0 ||
