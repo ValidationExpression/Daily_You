@@ -176,7 +176,7 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   }
 
   void _showDeleteEntryPopup() {
-    if (_newEntry) {
+    if (_newEntry && !_hasNewEntryChanges()) {
       Navigator.of(context).pop();
       return;
     }
@@ -191,15 +191,23 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
                   Text(MaterialLocalizations.of(context).deleteButtonTooltip),
               onPressed: () async {
                 _deletingEntry = true;
-                // Pop dialog
-                Navigator.of(context).pop();
-                // Pop edit page
-                Navigator.of(context).pop();
-                if (!_creatingNewEntry && Navigator.of(context).canPop()) {
-                  // Pop view page
-                  Navigator.of(context).pop();
+                _debounceTimer?.cancel();
+                EasyDebounce.cancel("save-entry");
+                final navigator = Navigator.of(context);
+                if (_newEntry) {
+                  // Persist so there is a saved entry (and any images) to delete
+                  await _saveEntry();
                 }
-                await _deleteEntry(_entry);
+                final entryToDelete = _entry;
+                // Pop dialog
+                navigator.pop();
+                // Pop edit page
+                navigator.pop();
+                if (!_creatingNewEntry && navigator.canPop()) {
+                  // Pop view page
+                  navigator.pop();
+                }
+                await _deleteEntry(entryToDelete);
               },
             ),
             TextButton(
@@ -531,14 +539,8 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
       final hasMoodChange = updatedEntry.mood != _lastMood;
       final hasDateChange = updatedEntry.timeCreate != _lastEntryDate;
 
-      final hasTagChange = _tagsExceedSeed();
-
       if (_newEntry) {
-        if (hasTextChange ||
-            hasMoodChange ||
-            hasDateChange ||
-            hasTagChange ||
-            _currentImages.isNotEmpty) {
+        if (_hasNewEntryChanges()) {
           if (Platform.isAndroid &&
               TimeManager.isSameDay(DateTime.now(), updatedEntry.timeCreate)) {
             await NotificationManager.instance.dismissReminderNotification();
@@ -620,6 +622,15 @@ class _AddEditEntryPageState extends State<AddEditEntryPage>
   void _onTagsChanged() {
     EasyDebounce.debounce(
         "save-entry", const Duration(seconds: 5), () => _saveEntry());
+  }
+
+  // Whether a not-yet-persisted entry has diverged from its default state
+  bool _hasNewEntryChanges() {
+    return text != _lastText ||
+        mood != _lastMood ||
+        entryDate != _lastEntryDate ||
+        _tagsExceedSeed() ||
+        _currentImages.isNotEmpty;
   }
 
   // Whether the working set holds anything beyond the seeded default tags
