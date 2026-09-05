@@ -3,7 +3,6 @@ import 'dart:ui' show PlatformDispatcher;
 import 'package:daily_you/config_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:shamsi_date/shamsi_date.dart';
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 import 'package:time_range_picker/time_range_picker.dart';
 

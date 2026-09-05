@@ -25,6 +25,7 @@ import 'package:path_provider/path_provider.dart';
 
 Future<bool> importFromDaylio(
     BuildContext context, Function(String) updateStatus) async {
+  final localizations = AppLocalizations.of(context)!;
   updateStatus("0%");
 
   final selectedFile = await FileLayer.pickFile();
@@ -38,11 +39,10 @@ Future<bool> importFromDaylio(
   await tempDaylioFolder.create(recursive: true);
 
   try {
-    updateStatus(AppLocalizations.of(context)!.tranferStatus("0"));
+    updateStatus(localizations.tranferStatus("0"));
     await FileLayer.copyFromExternalLocation(
         selectedFile, tempDir.path, tempDaylioZip, onProgress: (percent) {
-      updateStatus(
-          AppLocalizations.of(context)!.tranferStatus("${percent.round()}"));
+      updateStatus(localizations.tranferStatus("${percent.round()}"));
     });
 
     await ZipUtils.extract(
@@ -169,7 +169,7 @@ Future<bool> importFromDaylio(
     success = false;
   }
 
-  updateStatus(AppLocalizations.of(context)!.cleanUpStatus);
+  updateStatus(localizations.cleanUpStatus);
 
   await EntriesProvider.instance.load();
   await EntryImagesProvider.instance.load();

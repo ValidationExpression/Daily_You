@@ -17,6 +17,7 @@ import 'package:path_provider/path_provider.dart';
 
 Future<bool> importFromDaybook(
     BuildContext context, Function(String) updateStatus) async {
+  final localizations = AppLocalizations.of(context)!;
   updateStatus("0%");
 
   final selectedFile = await FileLayer.pickFile();
@@ -30,15 +31,13 @@ Future<bool> importFromDaybook(
   await tempZipFolder.create(recursive: true);
 
   try {
-    updateStatus(AppLocalizations.of(context)!.tranferStatus("0"));
+    updateStatus(localizations.tranferStatus("0"));
     await FileLayer.copyFromExternalLocation(
       selectedFile,
       tempDir.path,
       tempZip,
       onProgress: (percent) {
-        updateStatus(
-          AppLocalizations.of(context)!.tranferStatus("${percent.round()}"),
-        );
+        updateStatus(localizations.tranferStatus("${percent.round()}"));
       },
     );
 
@@ -150,7 +149,7 @@ Future<bool> importFromDaybook(
     success = false;
   }
 
-  updateStatus(AppLocalizations.of(context)!.cleanUpStatus);
+  updateStatus(localizations.cleanUpStatus);
 
   await EntriesProvider.instance.load();
   await EntryImagesProvider.instance.load();

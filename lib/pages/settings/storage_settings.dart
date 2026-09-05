@@ -91,6 +91,7 @@ class _StorageSettingsState extends State<StorageSettings> {
       },
     );
     if (confirmed) {
+      if (!mounted) return;
       ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
 
       BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
@@ -99,6 +100,7 @@ class _StorageSettingsState extends State<StorageSettings> {
         statusNotifier.value = status;
       });
 
+      if (!mounted) return;
       Navigator.of(context).pop();
 
       if (!locationSet) {
@@ -132,6 +134,7 @@ class _StorageSettingsState extends State<StorageSettings> {
       statusNotifier.value = status;
     });
 
+    if (!mounted) return;
     Navigator.of(context).pop();
 
     if (!locationSet) {

@@ -17,6 +17,7 @@ import 'package:sqflite/sqflite.dart';
 
 Future<bool> importFromDiarium(
     BuildContext context, Function(String) updateStatus) async {
+  final localizations = AppLocalizations.of(context)!;
   updateStatus("0%");
 
   var tempDir = await getTemporaryDirectory();
@@ -28,11 +29,10 @@ Future<bool> importFromDiarium(
     final dbPath = await FileLayer.pickFile();
     if (dbPath == null) return false;
 
-    updateStatus(AppLocalizations.of(context)!.tranferStatus("0"));
+    updateStatus(localizations.tranferStatus("0"));
     await FileLayer.copyFromExternalLocation(dbPath, tempDir.path, tempDbName,
         onProgress: (percent) {
-      updateStatus(
-          AppLocalizations.of(context)!.tranferStatus("${percent.round()}"));
+      updateStatus(localizations.tranferStatus("${percent.round()}"));
     });
 
     db = await openDatabase(join(tempDir.path, tempDbName), readOnly: true);
@@ -120,7 +120,7 @@ Future<bool> importFromDiarium(
     success = false;
   }
 
-  updateStatus(AppLocalizations.of(context)!.cleanUpStatus);
+  updateStatus(localizations.cleanUpStatus);
 
   await EntriesProvider.instance.load();
   await EntryImagesProvider.instance.load();

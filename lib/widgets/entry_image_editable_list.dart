@@ -76,10 +76,7 @@ class _EntryImageEditableListState extends State<EntryImageEditableList> {
               );
             },
             itemCount: _images.length,
-            onReorder: (int oldIndex, int newIndex) {
-              if (oldIndex < newIndex) {
-                newIndex -= 1;
-              }
+            onReorderItem: (int oldIndex, int newIndex) {
               final EntryImage image = _images.removeAt(oldIndex);
               _images.insert(newIndex, image);
               _updateImageRanks();

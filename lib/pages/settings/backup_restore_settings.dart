@@ -86,6 +86,7 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
     );
 
     if (chosenFormat != ImportFormat.none) {
+      if (!mounted) return;
       ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
 
       BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
@@ -124,6 +125,7 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
         });
       }
 
+      if (!mounted) return;
       Navigator.of(context).pop();
     }
   }
@@ -155,6 +157,7 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
     );
 
     if (chosenFormat != ExportFormat.none) {
+      if (!mounted) return;
       ValueNotifier<String> statusNotifier = ValueNotifier<String>("");
 
       BackupRestoreUtils.showLoadingStatus(context, statusNotifier);
@@ -165,6 +168,7 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
         });
       }
 
+      if (!mounted) return;
       Navigator.of(context).pop();
     }
   }
@@ -178,6 +182,7 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
       statusNotifier.value = status;
     });
 
+    if (!context.mounted) return;
     Navigator.of(context).pop();
 
     if (!success) {
@@ -210,6 +215,7 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
       statusNotifier.value = status;
     });
 
+    if (!context.mounted) return;
     Navigator.of(context).pop();
 
     if (!success) {
@@ -261,6 +267,7 @@ class _BackupRestoreSettingsState extends State<BackupRestoreSettings> {
       },
     );
     if (confirmed) {
+      if (!mounted) return;
       await _restoreData(context);
     }
   }

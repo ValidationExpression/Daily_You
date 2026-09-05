@@ -113,6 +113,7 @@ class _AuthPopupState extends State<AuthPopup> {
     final auth = LocalAuthentication();
     final canCheck = await auth.canCheckBiometrics;
     if (!canCheck) return false;
+    if (!mounted) return false;
 
     bool success = false;
     try {
@@ -137,6 +138,7 @@ class _AuthPopupState extends State<AuthPopup> {
       switch (widget.mode) {
         case AuthPopupMode.unlock:
           final valid = await validatePassword(_passwordController.text);
+          if (!mounted) return;
           if (valid) {
             widget.onSuccess?.call();
             Navigator.of(context).pop();
@@ -153,12 +155,14 @@ class _AuthPopupState extends State<AuthPopup> {
             break;
           }
           await savePassword(_passwordController.text);
+          if (!mounted) return;
           widget.onSuccess?.call();
           Navigator.of(context).pop();
           break;
 
         case AuthPopupMode.changePassword:
           final validOld = await validatePassword(_oldController.text);
+          if (!mounted) return;
           if (!validOld) {
             setState(() => _error = AppLocalizations.of(context)!
                 .settingsSecurityIncorrectPassword);
@@ -170,17 +174,19 @@ class _AuthPopupState extends State<AuthPopup> {
             break;
           }
           await savePassword(_passwordController.text);
+          if (!mounted) return;
           widget.onSuccess?.call();
           Navigator.of(context).pop();
           break;
       }
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   void _handleBiometric() async {
     final ok = await authenticateWithBiometrics();
+    if (!mounted) return;
     if (ok) {
       widget.onSuccess?.call();
       Navigator.of(context).pop();

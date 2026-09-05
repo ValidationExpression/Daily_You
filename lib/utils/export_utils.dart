@@ -24,6 +24,8 @@ enum ExportFormat {
 class ExportUtils {
   static Future<bool> exportToMarkdown(
       BuildContext context, Function(String) updateStatus) async {
+    final localizations = AppLocalizations.of(context)!;
+    final locale = TimeManager.currentLocale(context);
     updateStatus("(1/2) 0%");
 
     String? exportFolder;
@@ -57,8 +59,7 @@ class ExportUtils {
         StringBuffer noteBody = StringBuffer();
 
         final timestamp =
-            DateFormat("yyyy-MM-dd", TimeManager.currentLocale(context))
-                .format(entry.timeCreate);
+            DateFormat("yyyy-MM-dd", locale).format(entry.timeCreate);
         timestampCount[timestamp] = (timestampCount[timestamp] ?? 0) + 1;
         final index = timestampCount[timestamp]!;
         final indexSuffix = index > 1 ? "_$index" : "";
@@ -81,7 +82,7 @@ class ExportUtils {
           moodText = "${MoodIcon.getMoodIcon(entry.mood)} ";
         }
         noteBody.writeln(
-            "$moodText${DateFormat.yMMMEd(TimeManager.currentLocale(context)).format(entry.timeCreate)}\n${entry.text}");
+            "$moodText${DateFormat.yMMMEd(locale).format(entry.timeCreate)}\n${entry.text}");
 
         await FileLayer.createFile(tempExportFolder.path,
             "log_$timestamp$indexSuffix.md", utf8.encode(noteBody.toString()),
@@ -99,12 +100,11 @@ class ExportUtils {
       });
 
       // Save archive
-      updateStatus(AppLocalizations.of(context)!.tranferStatus("0"));
+      updateStatus(localizations.tranferStatus("0"));
       await FileLayer.copyToExternalLocation(
           join(tempDir.path, exportedZipName), exportFolder, exportedZipName,
           onProgress: (percent) {
-        updateStatus(
-            AppLocalizations.of(context)!.tranferStatus("${percent.round()}"));
+        updateStatus(localizations.tranferStatus("${percent.round()}"));
       });
     } catch (e) {
       updateStatus("$e");
@@ -113,7 +113,7 @@ class ExportUtils {
     }
 
     // Delete temp files
-    updateStatus(AppLocalizations.of(context)!.cleanUpStatus);
+    updateStatus(localizations.cleanUpStatus);
     await File(join(tempDir.path, exportedZipName)).delete();
     if (await tempExportFolder.exists()) {
       await tempExportFolder.delete(recursive: true);

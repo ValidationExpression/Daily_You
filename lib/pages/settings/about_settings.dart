@@ -83,6 +83,7 @@ class _AboutSettingsState extends State<AboutSettings> {
                 themeProvider.accentColor = pinkAccentColor;
                 themeProvider.updateAccentColor();
 
+                if (!context.mounted) return;
                 await showDialog(
                   context: context,
                   builder: (BuildContext context) {

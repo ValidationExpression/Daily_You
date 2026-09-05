@@ -12,6 +12,7 @@ import 'package:path_provider/path_provider.dart';
 class BackupRestoreUtils {
   static Future<bool> backupToZip(
       BuildContext context, void Function(String) updateStatus) async {
+    final localizations = AppLocalizations.of(context)!;
     bool exportSuccessful = true;
     var tempDir = await getTemporaryDirectory();
     final exportedZipName =
@@ -23,23 +24,21 @@ class BackupRestoreUtils {
       if (savePath == null) return false;
 
       // Create archive
-      updateStatus(AppLocalizations.of(context)!.creatingBackupStatus("0"));
+      updateStatus(localizations.creatingBackupStatus("0"));
       await ZipUtils.compress(tempExportZipFile.path, [
         await AppDatabase.instance.getInternalPath()
       ], [
         await ImageStorage.instance.getInternalFolder()
       ], onProgress: (percent) {
-        updateStatus(AppLocalizations.of(context)!
-            .creatingBackupStatus("${percent.round()}"));
+        updateStatus(localizations.creatingBackupStatus("${percent.round()}"));
       });
 
       // Save archive
-      updateStatus(AppLocalizations.of(context)!.tranferStatus("0"));
+      updateStatus(localizations.tranferStatus("0"));
       await FileLayer.copyToExternalLocation(
           tempExportZipFile.path, savePath, exportedZipName,
           onProgress: (percent) {
-        updateStatus(
-            AppLocalizations.of(context)!.tranferStatus("${percent.round()}"));
+        updateStatus(localizations.tranferStatus("${percent.round()}"));
       });
     } catch (e) {
       updateStatus("$e");
@@ -48,7 +47,7 @@ class BackupRestoreUtils {
     }
 
     // Delete temp files
-    updateStatus(AppLocalizations.of(context)!.cleanUpStatus);
+    updateStatus(localizations.cleanUpStatus);
     if (await tempExportZipFile.exists()) {
       await tempExportZipFile.delete();
     }
@@ -58,6 +57,7 @@ class BackupRestoreUtils {
 
   static Future<bool> restoreFromZip(
       BuildContext context, void Function(String) updateStatus) async {
+    final localizations = AppLocalizations.of(context)!;
     var importSuccessful = true;
     var tempDir = await getTemporaryDirectory();
     final tempZipName = "temp_backup.zip";
@@ -71,21 +71,19 @@ class BackupRestoreUtils {
       if (archive == null) return false;
 
       // Import archive
-      updateStatus(AppLocalizations.of(context)!.tranferStatus("0"));
+      updateStatus(localizations.tranferStatus("0"));
       await FileLayer.copyFromExternalLocation(
           archive, tempDir.path, tempZipName, onProgress: (percent) {
-        updateStatus(
-            AppLocalizations.of(context)!.tranferStatus("${percent.round()}"));
+        updateStatus(localizations.tranferStatus("${percent.round()}"));
       });
 
       // Restore archive
-      updateStatus(AppLocalizations.of(context)!.restoringBackupStatus("0"));
+      updateStatus(localizations.restoringBackupStatus("0"));
       await restoreFolder.create(recursive: true);
 
       await ZipUtils.extract(tempZipFile.path, restoreFolder.path,
           onProgress: (percent) {
-        updateStatus(AppLocalizations.of(context)!
-            .restoringBackupStatus("${percent.round()}"));
+        updateStatus(localizations.restoringBackupStatus("${percent.round()}"));
       });
 
       final tempDb = File(join(restoreFolder.path, 'daily_you.db'));
@@ -100,7 +98,7 @@ class BackupRestoreUtils {
         // Import images. These will be garbage collected after import
         if (await Directory(join(restoreFolder.path, "Images")).exists()) {
           // Also show cleanup status here since images may take awhile
-          updateStatus(AppLocalizations.of(context)!.cleanUpStatus);
+          updateStatus(localizations.cleanUpStatus);
           var files = Directory(join(restoreFolder.path, "Images")).list();
           final internalImagePath =
               await ImageStorage.instance.getInternalFolder();
@@ -124,7 +122,7 @@ class BackupRestoreUtils {
     }
 
     // Delete temp files
-    updateStatus(AppLocalizations.of(context)!.cleanUpStatus);
+    updateStatus(localizations.cleanUpStatus);
     if (await tempZipFile.exists()) {
       await tempZipFile.delete();
     }
