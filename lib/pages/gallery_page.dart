@@ -187,62 +187,73 @@ class _GalleryPageState extends State<GalleryPage>
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                RadioListTile<OrderBy>(
-                  value: OrderBy.date,
+                RadioGroup<OrderBy>(
                   groupValue: entriesProvider.orderBy,
-                  onChanged: (value) => setDialogState(() {
-                    if (value != null) {
-                      entriesProvider.orderBy = value;
-                      entriesProvider.trackerSortTagId = null;
+                  onChanged: (value) {
+                    final tappedTracker = value == OrderBy.tracker ||
+                        (value == null &&
+                            entriesProvider.orderBy == OrderBy.tracker);
+                    if (tappedTracker) {
+                      handleTrackerTap();
+                    } else if (value != null) {
+                      setDialogState(() {
+                        entriesProvider.orderBy = value;
+                        entriesProvider.trackerSortTagId = null;
+                      });
                     }
-                  }),
-                  title: Text(AppLocalizations.of(context)!.sortDateTitle),
-                ),
-                RadioListTile<OrderBy>(
-                  value: OrderBy.mood,
-                  groupValue: entriesProvider.orderBy,
-                  onChanged: (value) => setDialogState(() {
-                    if (value != null) {
-                      entriesProvider.orderBy = value;
-                      entriesProvider.trackerSortTagId = null;
-                    }
-                  }),
-                  title: Text(AppLocalizations.of(context)!.tagMoodTitle),
-                ),
-                RadioListTile<OrderBy>(
-                  value: OrderBy.tracker,
-                  groupValue: entriesProvider.orderBy,
-                  toggleable: true,
-                  onChanged: (_) => handleTrackerTap(),
-                  title:
-                      Text(AppLocalizations.of(context)!.tagTypeTrackerTitle),
-                  subtitle: trackerTag != null
-                      ? Text(
-                          trackerTag.name,
-                          maxLines: 1,
-                          softWrap: false,
-                          overflow: TextOverflow.fade,
-                        )
-                      : null,
+                  },
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      RadioListTile<OrderBy>(
+                        value: OrderBy.date,
+                        title:
+                            Text(AppLocalizations.of(context)!.sortDateTitle),
+                      ),
+                      RadioListTile<OrderBy>(
+                        value: OrderBy.mood,
+                        title: Text(AppLocalizations.of(context)!.tagMoodTitle),
+                      ),
+                      RadioListTile<OrderBy>(
+                        value: OrderBy.tracker,
+                        toggleable: true,
+                        title: Text(
+                            AppLocalizations.of(context)!.tagTypeTrackerTitle),
+                        subtitle: trackerTag != null
+                            ? Text(
+                                trackerTag.name,
+                                maxLines: 1,
+                                softWrap: false,
+                                overflow: TextOverflow.fade,
+                              )
+                            : null,
+                      ),
+                    ],
+                  ),
                 ),
                 const Divider(),
-                RadioListTile<SortOrder>(
-                  value: SortOrder.ascending,
+                RadioGroup<SortOrder>(
                   groupValue: entriesProvider.sortOrder,
-                  onChanged: (value) => setDialogState(() {
-                    if (value != null) entriesProvider.sortOrder = value;
-                  }),
-                  title: Text(
-                      AppLocalizations.of(context)!.sortOrderAscendingTitle),
-                ),
-                RadioListTile<SortOrder>(
-                  value: SortOrder.descending,
-                  groupValue: entriesProvider.sortOrder,
-                  onChanged: (value) => setDialogState(() {
-                    if (value != null) entriesProvider.sortOrder = value;
-                  }),
-                  title: Text(
-                      AppLocalizations.of(context)!.sortOrderDescendingTitle),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setDialogState(() => entriesProvider.sortOrder = value);
+                    }
+                  },
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      RadioListTile<SortOrder>(
+                        value: SortOrder.ascending,
+                        title: Text(AppLocalizations.of(context)!
+                            .sortOrderAscendingTitle),
+                      ),
+                      RadioListTile<SortOrder>(
+                        value: SortOrder.descending,
+                        title: Text(AppLocalizations.of(context)!
+                            .sortOrderDescendingTitle),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
