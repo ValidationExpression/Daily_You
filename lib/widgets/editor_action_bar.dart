@@ -205,8 +205,10 @@ class _EditorActionBarState extends State<EditorActionBar> {
   ToolbarEntry _dividerEntry() => ToolbarEntry(
         width: EditorActionBar._dividerWidth,
         kind: ToolbarEntryKind.divider,
-        build: (_, __) => const VerticalDivider(
-            width: EditorActionBar._dividerWidth, thickness: 1),
+        build: (context, __) => VerticalDivider(
+            width: EditorActionBar._dividerWidth,
+            thickness: 1,
+            color: IconTheme.of(context).color?.withValues(alpha: 0.4)),
       );
 
   List<ToolbarEntry> _spaced(List<ToolbarEntry> entries) {
